@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Correcteur orthographique ChatGPT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-top: 50px;
+        }
+        
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .highlight {
+            background-color: #d9ffcc;
+            padding: 2px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Correcteur orthographique ChatGPT</h1>
+    <div class="container">
+        <form>
+            <label for="input-text">Entrez votre texte :</label>
+            <textarea id="input-text" rows="10" cols="50"></textarea>
+            <button type="submit">Corriger</button>
+        </form>
+        <div id="output-text"></div>
+    </div>
+
+    <script>
+        const form = document.querySelector('form');
+        const inputText = document.querySelector('#input-text');
+        const outputText = document.querySelector('#output-text');
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const textToCorrect = inputText.value;
+            if (textToCorrect) {
+                const data = {
+                    text: textToCorrect
+                };
+                fetch('https://api.openai.com/v1/language/models/chatgpt-3/davinci-correct/tokens/autocomplete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': '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' // Replace with your actual API key
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const correctedText = data.choices[0].text;
+                    outputText.innerHTML = highlightErrors(textToCorrect, correctedText);
+                })
+                .catch(error => console.error(error));
+            }
+        });
+
+        function highlightErrors(originalText, correctedText) {
+            const originalWords = originalText.split(/\b/);
+            const correctedWords = correctedText.split(/\b/);
+            let highlightedText = '';
+            for (let i = 0; i < originalWords.length; i++) {
+                const originalWord = originalWords[i];
+                const correctedWord = correctedWords[i];
+                if (originalWord !== correctedWord) {
+                    highlightedText += `<span class="highlight">${correctedWord}</span>`;
+                } else {
+                    highlightedText += originalWord;
+                }
+            }
+            return highlightedText;
+        }
+    </script>
+</body
