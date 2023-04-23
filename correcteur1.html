@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Correcteur orthographique</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <h1>Correcteur orthographique</h1>
+    <label for="texte">Entrez votre texte :</label>
+    <br>
+    <textarea id="texte" rows="10" cols="50"></textarea>
+    <br>
+    <button onclick="corriger()">Corriger</button>
+    <hr>
+    <div id="resultat"></div>
+    
+    <script>
+      function corriger() {
+        let texte = document.getElementById("texte").value;
+        axios.post('https://api.openai.com/v1/language/models/grammarchecker:correct', {
+          "data": texte,
+          "model": "text-correct",
+          "prompt": "Please correct the following text:",
+          "temperature": 0.5,
+          "max_tokens": 60
+        }, {
+          headers: {
+            'Authorization': 'Bearer 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',
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With'
+          }
+        })
+        .then(function(response) {
+          let resultat = response.data.choices[0].text;
+          resultat = resultat.replaceAll("<|endoftext|>
